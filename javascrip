@@ -1,0 +1,83 @@
+// Initialize the canvas and context
+var canvas = document.getElementById('gameCanvas');
+var context = canvas.getContext('2d');
+
+// Create an array to store flies
+var flies = [];
+
+// Initialize the score
+var score = 0;
+
+// Function to create a new fly
+function createFly() {
+    var fly = {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 20 + 10,
+        speedX: (Math.random() - 0.5) * 5,
+        speedY: (Math.random() - 0.5) * 5
+    };
+    flies.push(fly);
+}
+
+// Function to handle mouse click event
+function handleMouseClick(event) {
+    var mouseX = event.clientX - canvas.offsetLeft;
+    var mouseY = event.clientY - canvas.offsetTop;
+
+    // Check if the mouse click hit any fly
+    for (var i = 0; i < flies.length; i++) {
+        var fly = flies[i];
+        if (mouseX >= fly.x && mouseX <= fly.x + fly.size &&
+            mouseY >= fly.y && mouseY <= fly.y + fly.size) {
+            // A fly was shot, remove it and increase the score
+            flies.splice(i, 1);
+            score++;
+            break;
+        }
+    }
+}
+
+// Function to update the game state
+function update() {
+    // Clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the flies
+    for (var i = 0; i < flies.length; i++) {
+        var fly = flies[i];
+
+        // Update fly position
+        fly.x += fly.speedX;
+        fly.y += fly.speedY;
+
+        // Check if the fly is out of bounds, wrap it around
+        if (fly.x < 0) fly.x = canvas.width;
+        if (fly.y < 0) fly.y = canvas.height;
+        if (fly.x > canvas.width) fly.x = 0;
+        if (fly.y > canvas.height) fly.y = 0;
+
+        // Draw the fly
+        context.fillStyle = 'black';
+        context.fillRect(fly.x, fly.y, fly.size, fly.size);
+    }
+
+    // Draw the score
+    context.fillStyle = 'black';
+    context.font = '20px Arial';
+    context.fillText('Score: ' + score, 10, 30);
+
+    // Schedule the next frame update
+    requestAnimationFrame(update);
+}
+
+// Create initial flies
+for (var i = 0; i < 10; i++) {
+    createFly();
+}
+
+// Add event listener for mouse click
+canvas.addEventListener('click', handleMouseClick);
+
+// Start the game loop
+update();
